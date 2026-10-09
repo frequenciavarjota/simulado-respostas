@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Atividade de matemática</title>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --papel:#f8fafd; --grade:#d3e3f4; --tinta:#1b3aa8; --margem:#e5484d; --texto:#1c2540; --ok:#1a7f4b; --linha:#9fb4dc;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    font-family:"Atkinson Hyperlegible",system-ui,sans-serif; color:var(--texto);
+    background-color:var(--papel);
+    background-image:
+      linear-gradient(var(--grade) 1px,transparent 1px),
+      linear-gradient(90deg,var(--grade) 1px,transparent 1px);
+    background-size:28px 28px;
+    min-height:100vh;
+  }
+  main{
+    max-width:1100px; margin:0 auto; padding:28px 20px 56px 28px; min-height:100vh;
+    background:rgba(248,250,253,.9); border-left:2px solid var(--margem);
+  }
+  h1{font-size:1.7rem; margin:0 0 4px; color:var(--tinta)}
+  .sub{margin:0 0 18px; color:#52608a}
+  .dados{display:grid; grid-template-columns:2fr 1fr 1fr; gap:12px; margin:0 0 18px}
+  .campo label{display:block; font-weight:700; color:var(--tinta); margin:0 0 5px}
+  .campo input{width:100%; min-width:0}
+  .tabela{width:100%; overflow:hidden; border:2px solid var(--linha); border-radius:6px; background:#fff}
+  table{border-collapse:collapse; width:100%; table-layout:fixed}
+  th,td{padding:3px 2px; border-bottom:1px solid #dbe5f5; text-align:center; overflow:hidden}
+  thead th{position:sticky; top:0; background:#eaf0fb; color:var(--tinta); font-size:.9rem; padding:8px 2px; white-space:normal; border-bottom:2px solid var(--linha); line-height:1.05}
+  thead th small{display:block; font-weight:400; color:#52608a; font-size:.62rem; margin-top:2px}
+  th:first-child,td.n{color:#52608a; width:3.2%}
+  th.nome-c,td.nome-c{width:20%; position:sticky; left:0; background:#fff}
+  thead th.nome-c{position:sticky; left:0; z-index:2; text-align:left}
+  input{
+    font:inherit; color:inherit; width:100%; padding:7px 8px;
+    background:#fff; border:2px solid var(--linha); border-radius:5px;
+  }
+  input.resp{width:100%; min-width:0; text-align:center; font-size:.95rem; padding:5px 2px}
+  input:focus{outline:3px solid #ffb703; outline-offset:1px; border-color:var(--tinta)}
+  tr.alerta td{background:#fdeceb}
+  tr.alerta td.nome-c{background:#fdeceb}
+  #status{margin-top:16px; color:#52608a; min-height:1.5em}
+  #status.erro{color:var(--margem); font-weight:700}
+  button{
+    margin-top:12px; width:100%; max-width:420px; display:block; padding:14px; font:inherit; font-weight:700; font-size:1.1rem;
+    color:#fff; background:var(--tinta); border:0; border-radius:6px; cursor:pointer;
+  }
+  button:hover:not(:disabled){background:#142b80}
+  button:focus-visible{outline:3px solid #ffb703; outline-offset:2px}
+  button:disabled{background:#8794c4; cursor:not-allowed}
+  button.carregando:disabled{cursor:wait}
+  #msg{margin-top:16px; font-weight:700; min-height:1.5em}
+  #msg.erro{color:var(--margem)} #msg.ok{color:var(--ok)}
+  @media (max-width:700px){
+    main{padding:16px 8px 36px 10px}
+    h1{font-size:1.35rem}
+    .sub{font-size:.9rem}
+    .dados{grid-template-columns:1fr 1fr; gap:8px}
+    .dados .campo:first-child{grid-column:1 / -1}
+    th,td{padding:2px 1px}
+    thead th{font-size:.68rem; padding:6px 1px}
+    thead th small{font-size:.48rem}
+    th.nome-c,td.nome-c{width:22%}
+    input{padding:5px 4px; font-size:.82rem}
+    input.resp{font-size:.72rem; padding:5px 1px}
+    td.n{font-size:.72rem}
+  }
+  @media (max-width:420px){
+    main{padding-left:6px; padding-right:4px}
+    .dados{grid-template-columns:1fr 1fr}
+    th,td{padding:1px}
+    thead th{font-size:.6rem}
+    thead th small{font-size:.42rem}
+    th.nome-c,td.nome-c{width:21%}
+    input{padding:4px 2px; font-size:.72rem}
+    input.resp{font-size:.62rem}
+  }
+</style>
+</head>
+<body>
+<main>
+  <h1>RESPOSTA SIMULADO </h1>
+  <p class="sub">Preencha a escola, turno e turma. Depois digite o nome de cada aluno e as respostas na mesma linha.</p>
+
+  <div class="dados">
+    <div class="campo">
+      <label for="escola">Escola</label>
+      <input id="escola" type="text" maxlength="120" autocomplete="organization" placeholder="Digite o nome da escola">
+    </div>
+    <div class="campo">
+      <label for="ano">Professor</label>
+      <input id="ano" type="text" maxlength="20" inputmode="numeric" placeholder="Ex.: Maria">
+    </div>
+    <div class="campo">
+      <label for="turma">Turma</label>
+      <input id="turma" type="text" maxlength="30" placeholder="Ex.: 5º A">
+    </div>
+  </div>
+
+  <div class="tabela"><table>
+    <thead id="cab"></thead>
+    <tbody id="corpo"></tbody>
+  </table></div>
+
+  <div id="status" aria-live="polite"></div>
+  <button id="enviar" type="button" disabled>Enviar respostas</button>
+  <div id="msg" role="status" aria-live="polite"></div>
+</main>
+
+<script>
+/* ====== CONFIGURAÇÃO ====== */
+// URL do Web App do Google Apps Script (veja apps-script.gs)
+const URL_APPS_SCRIPT = "https://script.google.com/macros/s/AKfycbxUq82cjE-SgvP1lwboEJr2q04avYk52dC6iJq76ZpV8cjQCXkN3zeCeI0J2RRWjQAiYQ/exec";
+
+const TOTAL_ALUNOS = 30;
+
+// Troque pelas 10 perguntas. "r" é a resposta certa (deixe "" para não corrigir)
+const PERGUNTAS = [
+  {q:"Questão 1",  r:""}, {q:"Questão 2", r:""},  {q:"Questão 3", r:""}, {q:"Questão 4", r:""}, {q:"Questão 5", r:""},
+  {q:"Questão 6", r:""},  {q:"Questão 7", r:""}, {q:"Questão 8", r:""},    {q:"Questão 9", r:""}, {q:"Questão 10", r:""}
+];
+const TEMPO_LIMITE_MS = 15000;
+/* ========================== */
+
+const $ = id => document.getElementById(id);
+const norm = s => String(s).trim().replace(",", ".");
+let envioId = null;   // mesmo id nas novas tentativas: evita linhas duplicadas na planilha
+let enviando = false;
+
+// cabeçalho
+$("cab").innerHTML = "<tr><th>#</th><th class='nome-c'>Nome</th>" +
+  PERGUNTAS.map(p => `<th>${p.q}</th>`).join("") + "</tr>";
+
+// 30 linhas: nome + 10 respostas
+for (let i = 0; i < TOTAL_ALUNOS; i++) {
+  const tr = document.createElement("tr");
+  tr.innerHTML = `<td class="n">${i + 1}</td>
+    <td class="nome-c"><input type="text" class="nome" maxlength="60" autocomplete="off" aria-label="Nome do aluno ${i + 1}"></td>` +
+    PERGUNTAS.map((_, j) =>
+      `<td><input type="text" class="resp" inputmode="numeric" maxlength="1" pattern="[01]" autocomplete="off" aria-label="Aluno ${i + 1}, resposta ${j + 1}"></td>`).join("");
+  $("corpo").appendChild(tr);
+}
+const linhasDOM = [...$("corpo").rows];
+
+// lê a tabela e separa o que pode ser enviado do que está incompleto
+function coletar() {
+  const linhas = [], semNome = [];
+  linhasDOM.forEach((tr, i) => {
+    const nome = tr.querySelector(".nome").value.trim();
+    const respostas = [...tr.querySelectorAll(".resp")].map(x => x.value.trim()).map(r => r === "0" || r === "1" ? r : "");
+    const temResp = respostas.some(r => r !== "");
+    const incompleta = !nome && temResp;
+    tr.classList.toggle("alerta", incompleta);
+    if (incompleta) semNome.push(i + 1);
+    if (nome && temResp) {
+      const acertos = PERGUNTAS.some(p => p.r !== "")
+        ? respostas.filter((r, k) => norm(r) === norm(PERGUNTAS[k].r)).length : "";
+      linhas.push({nome, respostas, acertos});
+    }
+  });
+  return {linhas, semNome};
+}
+
+function atualizar() {
+  const {linhas, semNome} = coletar();
+  const escola = $("escola").value.trim();
+  const ano = $("ano").value.trim();
+  const turma = $("turma").value.trim();
+  const st = $("status");
+  if (semNome.length) {
+    st.className = "erro";
+    st.textContent = "Falta o nome na linha " + semNome.join(", ") + ".";
+  } else if (!escola || !ano || !turma) {
+    st.className = "erro";
+    st.textContent = "Preencha Escola, Ano e Turma antes de enviar.";
+  } else {
+    st.className = "";
+    st.textContent = linhas.length
+      ? linhas.length + (linhas.length > 1 ? " alunos prontos" : " aluno pronto") + " para enviar."
+      : "Preencha pelo menos um nome e suas respostas.";
+  }
+  $("enviar").disabled = enviando || !linhas.length || semNome.length > 0 || !escola || !ano || !turma;
+}
+document.addEventListener("input", (e) => {
+  if (e.target.classList.contains("resp")) {
+    e.target.value = e.target.value.replace(/[^01]/g, "").slice(0, 1);
+  }
+  if ($("msg").className === "ok") { $("msg").textContent = ""; $("msg").className = ""; }
+  atualizar();
+});
+atualizar();
+
+$("enviar").addEventListener("click", async () => {
+  if (enviando) return;
+  const msg = $("msg"), btn = $("enviar");
+  const {linhas, semNome} = coletar();
+  const escola = $("escola").value.trim();
+  const ano = $("ano").value.trim();
+  const turma = $("turma").value.trim();
+  if (!linhas.length || semNome.length || !escola || !ano || !turma) return;
+
+  if (!navigator.onLine) {
+    msg.className = "erro";
+    msg.textContent = "Sem internet. Nada foi enviado. Conecte-se e tente de novo.";
+    return;
+  }
+
+  envioId = envioId || (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random());
+  const payload = {
+    id: envioId,
+    data: new Date().toLocaleString("pt-BR"),
+    escola,
+    ano,
+    turma,
+    perguntas: PERGUNTAS.map(p => p.q),
+    total: PERGUNTAS.length,
+    linhas
+  };
+
+  enviando = true; btn.disabled = true; btn.classList.add("carregando");
+  msg.className = ""; msg.textContent = "Enviando…";
+
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), TEMPO_LIMITE_MS);
+  try {
+    // text/plain evita o preflight de CORS no Apps Script
+    const r = await fetch(URL_APPS_SCRIPT, {
+      method: "POST",
+      headers: {"Content-Type": "text/plain;charset=utf-8"},
+      body: JSON.stringify(payload),
+      signal: ctrl.signal
+    });
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    const j = await r.json();
+    if (!j.ok) throw new Error(j.erro || "Servidor recusou");
+
+    // confirmado pelo servidor: limpa a tabela
+    document.querySelectorAll("#corpo input").forEach(x => x.value = "");
+    $("escola").value = "";
+    $("ano").value = "";
+    $("turma").value = "";
+    envioId = null;
+    msg.className = "ok";
+    msg.textContent = "Enviado com sucesso: " + linhas.length + (linhas.length > 1 ? " alunos registrados" : " aluno registrado")
+      + " às " + new Date().toLocaleTimeString("pt-BR", {hour:"2-digit", minute:"2-digit"}) + ".";
+  } catch (err) {
+    msg.className = "erro";
+    msg.textContent = "Não foi possível enviar. Nada foi registrado. As respostas continuam na tela: confira a conexão e clique em Enviar de novo.";
+  } finally {
+    clearTimeout(timer);
+    enviando = false; btn.classList.remove("carregando");
+    atualizar();
+  }
+});
+</script>
+</body>
+</html>
