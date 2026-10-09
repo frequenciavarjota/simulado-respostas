@@ -244,7 +244,7 @@ $("enviar").addEventListener("click", async () => {
     });
 
     msg.className = "ok";
-    msg.textContent = "Solicitação enviada. Como o Google Apps Script não permite confirmar a gravação pelo navegador neste modo, confira a planilha antes de limpar ou reenviar os dados. Os campos foram mantidos na tela.";
+    msg.textContent = "Solicitação enviada";
     // Mantém o mesmo ID e os dados na tela para permitir conferência e evitar duplicidade.
   } catch (err) {
     msg.className = "erro";
